@@ -24,20 +24,15 @@ jobs:
 
       - name: Descompactar projeto
         run: |
+          mkdir projeto
           unzip -q VooLivre_Android_AdMob_Configurado.zip -d projeto
 
-      - name: Instalar Android SDK
-        run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0"
-
       - name: Gerar APK
-        run: |
-          cd projeto/VooLivre_Android_AdMob
-          gradle assembleDebug --no-daemon
+        working-directory: projeto
+        run: gradle assembleDebug --no-daemon
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
           name: VooLivre-APK
-          path: projeto/VooLivre_Android_AdMob/app/build/outputs/apk/debug/app-debug.apk
+          path: projeto/app/build/outputs/apk/debug/app-debug.apk
