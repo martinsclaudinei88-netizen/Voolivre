@@ -1,0 +1,43 @@
+name: Gerar APK Voo Livre
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Descompactar projeto
+        run: |
+          unzip -q VooLivre_Android_AdMob_Configurado.zip -d projeto
+
+      - name: Instalar Android SDK
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Gerar APK
+        run: |
+          cd projeto/VooLivre_Android_AdMob
+          gradle assembleDebug --no-daemon
+
+      - name: Disponibilizar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: VooLivre-APK
+          path: projeto/VooLivre_Android_AdMob/app/build/outputs/apk/debug/app-debug.apk
